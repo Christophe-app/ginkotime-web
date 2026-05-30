@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Ginko Temps Réel</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+  body {
+    color: #050505;
+    margin: 0;
+    padding: 0;
+    background: #d9d9db;
+    font-family: Arial, sans-serif;
+    overflow-x: hidden;
+    width: 100vw;
+  }
+
+  html, body {
+    width: 100% !important;
+  }
+
+  #app {
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+    position: relative;
+    background: #d9d9db;
+    min-height: 100vh;
+  }
+
+  #container {
+    width: 100%;
+    box-sizing: border-box;
+    margin: 10px auto;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .line {
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+
+  .passage {
+    display: grid;
+    grid-template-columns: 1fr auto;
+  }
+
+  .line-title {
+    font-weight: bold;
+    margin-bottom: 6px;
+  }
+
+  .badge {
+    padding: 2px 6px;
+    border-radius: 6px;
+    color: white;
+    font-size: 11px;
+  }
+
+  .line-badge {
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 12px;
+    color: #000;
+  }
+
+  .faible { background:#2ecc71; }
+  .moyenne { background:#f39c12; }
+  .forte { background:#e74c3c; }
+
+  #controls {
+    display:flex;
+    gap:6px;
+    justify-content:center;
+    margin-bottom:15px;
+  }
+
+  #stopInput {
+    width:200px;
+    padding:6px;
+    border-radius:8px;
+  }
+
+  #div-clock {
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+  #div-clock b {
+    font-weight: 600;
+  }
+
+  button {
+    padding:6px 10px;
+    border-radius:8px;
+    border:none;
+    background:#00abc4;
+    color:white;
+    cursor:pointer;
+  }
+
+  #div-buttons-busstop {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(0, max-content));
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  #div-buttons-busstop button {
+    padding: 6px 10px;
+    font-size: 12px;
+    border-radius: 8px;
+
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+
+    white-space: nowrap;
+    width: auto;
+  }
+
+  #ginko-info-calendar {
+    text-align:center;
+    margin:10px 0;
+    font-style: italic;
+  }
+
+  .ginko-info-calendar-badge {
+    padding:2px 10px;
+    border-radius:6px;
+    color:white;
+  }
+  #div-options {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 40px;
+    margin-bottom: 20px;
+  }
+
+  #div-extension-information {
+    text-align: center;
+    margin-top: 15px;
+    margin-bottom: 15px;
+  }
+
+
+  /* ===== MOBILE ===== */
+  @media screen and (max-width: 768px) {
+    body {
+      background: #cfd2d6;
+    }
+
+    #app {
+      width: 95%;
+      max-width: 540px;
+      margin: 12px auto;
+      background: #ffffff;
+      border-radius: 14px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      overflow: hidden;
+      padding-bottom: 10px;
+    }
+
+    #container {
+      padding: 0 10px;
+    }
+
+    #stopInput {
+      width: 90%;
+      max-width: 300px;
+      margin: 0 auto;
+      display: block;
+    }
+
+    #controls {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #controls button {
+      width: 90%;
+      max-width: 200px;
+    }
+
+    .line {
+      padding: 10px;
+    }
+
+    .line-title {
+      font-size: 14px;
+    }
+
+    .passage {
+      font-size: 14px;
+    }
+
+    #div-buttons-busstop {
+      margin-bottom: 30px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    #div-buttons-busstop button {
+      flex: 0 1 auto;
+    }
+
+    #div-options {
+      flex-direction: column;
+    }
+
+    #div-options button {
+      width: 100%;
+    }
+  }
+  </style>
+</head>
+
+
+
+<body>
+<div id="app">
+
+
+  <div id="div-clock"><b>Date :</b> <span id="clock"></span></div>
+
+
+  <div id="ginko-info-calendar">Chargement du calendrier...</div>
+
+
+  <div id="controls">
+    <input id="stopInput" value="Victor Hugo"/>
+    <button id="saveStop">Valider</button>
+  </div>
+
+
+  <div id="div-buttons-busstop">
+    <button data-stop="Victor Hugo">Victor Hugo</button>
+    <button data-stop="Corvée">Corvée</button>
+    <button data-stop="Croix de palente">Croix de palente</button>
+    <button data-stop="Lebeuf">Lebeuf</button>
+    <button data-stop="Chopin">Chopin</button>
+    <button data-stop="Révolution">Révolution</button>
+    <button data-stop="Cité des arts">Cité des arts</button>
+  </div>
+
+
+  <div id="container"></div>
+
+
+  <div id="div-options">
+    <button id="button-calendar">Calendrier voyageurs</button>
+    <button id="button-schedule-corvee">Horaires : Corvée</button>
+    <button id="button-schedule-croixdepalente">Horaires : Croix de palente</button>
+  </div>
+
+
+  <div id="div-extension-information"><i>Ginko Temps Réel - web v0.0.3 - Christophe</i></div>
+
+
+  <script>
+  // ===== STORAGE =====
+  function loadStop(){ return localStorage.getItem("busStop") || "Victor Hugo"; }
+  function saveStop(v){ localStorage.setItem("busStop", v); }
+
+  // ===== API =====
+  const API_URL="https://www.ginko.voyage/se-deplacer/horaires-affluences/horaires-en-temps-reel?tx_kgmoncompte_kgmoncompte_ajax[action]=ajax&tx_kgmoncompte_kgmoncompte_ajax[controller]=Main&type=476&cHash=8496df246e50c379bcbee75cf3fc15c6";
+
+  async function fetchData(busStop){
+    const p=new URLSearchParams();
+    p.append("requete","tempsreel_submit");
+    p.append("requete_val[arret]",busStop);
+
+    const res=await fetch(API_URL,{
+      method:"POST",
+      headers:{ "Content-Type":"application/x-www-form-urlencoded" },
+      body:p.toString()
+    });
+
+    return parse(await res.text(),busStop);
+  }
+
+  // ===== PARSE =====
+  function parse(html,stop){
+    const doc=new DOMParser().parseFromString(html,"text/html");
+    const result={};
+
+    [...doc.body.querySelectorAll("div,li,section")].forEach(el=>{
+      const text=el.textContent?.replace(/\s+/g," ").trim();
+      if(!text || !text.includes("direction")) return;
+      if(stop && !text.includes(stop)) return;
+
+      const m=text.match(/\b(L\d+|T\d+|Plan B|Ginko Citadelle|\d{1,2})\b/);
+      if(!m) return;
+
+      const ligne=m[1];
+      const dir=(text.match(/direction\s+([^,]+)/i)||[])[1]||"—";
+
+      const passages=[];
+      // ===== Cas normal : avec affluence =====
+      [...text.matchAll(/(\d{1,2}\s*min|\d{1,2}:\d{2})\s+Affluence\s+(faible|moyenne|forte)/gi)]
+      .forEach(x=>{
+        passages.push({
+          temps:x[1],
+          affluence:x[2].toLowerCase()
+        });
+      });
+
+      // ===== Jour gris : horaires sans affluence =====
+      if(!passages.length){
+
+        [...text.matchAll(/(\d{1,2}\s*min|\d{1,2}:\d{2})/g)]
+        .forEach(x=>{
+          passages.push({
+            temps:x[1],
+            affluence:null
+          });
+        });
+      }
+      if(!passages.length) return;
+
+      const k=ligne+"_"+dir;
+      if(!result[k]) result[k]={ligne,dir,passages:[]};
+      result[k].passages.push(...passages);
+    });
+
+    return Object.values(result);
+  }
+
+  // ===== COLORS =====
+  function getLineColor(line){
+    const colors = {
+      "Plan B": "#1E191A",
+      "T1": "#00A5C2",
+      "T2": "#006D78",
+      "L3": "#006AB3",
+      "L4": "#E2001A",
+      "L5": "#1FA22E",
+      "L6": "#FFE500",
+      "7": "#A74C21",
+      "8": "#00396B",
+      "9": "#F29400",
+      "10": "#CECB00",
+      "11": "#C592BE",
+      "12": "#7BC6BC",
+      "Ginko Citadelle": "#F26522",
+      "Citadelle": "#F26522"
+    };
+    return colors[line] || "#5C6970";
+  }
+
+  function hexToRgba(hex, alpha){
+    hex = hex.replace("#","");
+    const r=parseInt(hex.substring(0,2),16);
+    const g=parseInt(hex.substring(2,4),16);
+    const b=parseInt(hex.substring(4,6),16);
+    return `rgba(${r},${g},${b},${alpha})`;
+  }
+
+  // ===== RENDER =====
+  function render(data){
+    const c=document.getElementById("container");
+    c.innerHTML="";
+
+    data.forEach(info=>{
+      if(!info.passages.length) return;
+
+      const cleanLine = info.ligne.replace("Ginko ","").trim();
+      const color=getLineColor(cleanLine);
+
+      const div=document.createElement("div");
+      div.className="line";
+
+      div.style.background=hexToRgba(color,0.08);
+      div.style.borderLeft=`4px solid ${color}`;
+
+      div.innerHTML=`
+        <div class="line-title">
+          <span class="line-badge" style="background:${color}">
+            ${info.ligne}
+          </span>
+          → ${info.dir}
+        </div>
+        ${info.passages.slice(0,3).map(p=>`
+          <div class="passage">
+            <span>${p.temps}</span>
+            ${p.affluence
+              ? `<span class="badge ${p.affluence}">${p.affluence}</span>`
+              : ""
+            }
+          </div>`).join("")}
+      `;
+
+      c.appendChild(div);
+    });
+  }
+
+  // ===== CALENDAR =====
+  async function loadCalendar(){
+    try{
+      const res=await fetch("https://www.ginko.voyage/se-deplacer/horaires-affluences/calendrier-voyageurs/");
+      const html=await res.text();
+      const text=new DOMParser().parseFromString(html,"text/html").body.innerText;
+
+      const match=text.match(/Aujourd'hui.*?jour\s+([a-zéèêà]+)/i);
+
+      const container=document.getElementById("ginko-info-calendar");
+
+      if(match){
+        const color=match[1];
+        const map={
+          rose:"#B7007A",
+          jaune:"#FFDD02",
+          bleu:"#00ABC4",
+          orange:"#EA412C",
+          gris:"#636F7B"
+        };
+
+        container.innerHTML=`Aujourd'hui : <span class="ginko-info-calendar-badge" style="background:${map[color]}">jour ${color}</span>`;
+      } else {
+        container.textContent="Calendrier non trouvé";
+      }
+    }catch{
+      document.getElementById("ginko-info-calendar").textContent="Erreur calendrier";
+    }
+  }
+
+  // ===== EVENTS FIX =====
+
+  // boutons externes (FIX)
+  document.getElementById("button-calendar").addEventListener("click", () => {
+    window.open("https://www.ginko.voyage/se-deplacer/horaires-affluences/calendrier-voyageurs/", "_blank");
+  });
+  document.getElementById("button-schedule-corvee").addEventListener("click", () => {
+    window.open("https://tim.ginko.voyage/ginko/fiche_horaire/6/false/CORVEE2", "_blank");
+  });
+  document.getElementById("button-schedule-croixdepalente").addEventListener("click", () => {
+    window.open("https://tim.ginko.voyage/ginko/fiche_horaire/101/false/t_cdp2", "_blank");
+  });
+
+  // boutons arrêts
+  document.getElementById("div-buttons-busstop").addEventListener("click", e=>{
+    const b=e.target.closest("button");
+    if(!b) return;
+    stopInput.value=b.dataset.stop;
+    saveStop(b.dataset.stop);
+    loadData();
+  });
+
+  // bouton valider
+  document.getElementById("saveStop").addEventListener("click", async ()=>{
+    await saveStop(stopInput.value);
+    loadData();
+  });
+
+  // Bouton "Entrée"
+  document.getElementById("stopInput").addEventListener("keydown", async (e)=>{
+    if(e.key==="Enter"){
+      await saveStop(stopInput.value);
+      loadData();
+    }
+  });
+
+  // ===== CLOCK =====
+  setInterval(()=>{
+    document.getElementById("clock").textContent=new Date().toLocaleString("fr-FR");
+  },1000);
+
+  // ===== MAIN =====
+  async function loadData(){
+    try{
+      const data=await fetchData(loadStop());
+      if(!data.length) container.innerHTML="<i>Aucune donnée disponible</i>";
+      else render(data);
+    }catch{
+      container.innerHTML="<i>Erreur</i>";
+    }
+  }
+
+  // ===== INIT =====
+  stopInput.value=loadStop();
+  loadData();
+  loadCalendar();
+  setInterval(loadData,10000);
+  </script>
+
+</div>
+</body>
+</html>
