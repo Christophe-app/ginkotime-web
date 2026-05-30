@@ -1,0 +1,21 @@
+{
+  "name": "GinkoTime",
+  "short_name": "GinkoTime",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#d9d9db",
+  "theme_color": "#00abc4",
+  "description": "Horaires bus temps réel Ginko",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

@@ -3,6 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <title>Ginko Temps Réel</title>
+  
+  <link rel="icon" href="favicon.ico">
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#00abc4">
+  <link rel="icon" href="favicon.ico">
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -482,7 +488,11 @@
   },1000);
 
   // ===== MAIN =====
+  let loading=false;
   async function loadData(){
+    if(loading) return;
+    loading=true;
+    const container=document.getElementById("container");
     try{
       const data=await fetchData(loadStop());
       if(!data.length) container.innerHTML="<i>Aucune donnée disponible</i>";
@@ -490,15 +500,27 @@
     }catch{
       container.innerHTML="<i>Erreur</i>";
     }
+    finally{
+        loading=false;
+    }
   }
 
   // ===== INIT =====
   stopInput.value=loadStop();
   loadData();
   loadCalendar();
-  setInterval(loadData,10000);
+  setInterval(loadData, 30000);
   </script>
 
 </div>
+
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./service-worker.js')
+    .then(() => console.log("Service Worker OK"))
+    .catch(err => console.error("SW error:", err));
+}
+</script>
+
 </body>
 </html>
