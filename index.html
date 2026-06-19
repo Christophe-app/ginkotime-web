@@ -1,3 +1,13 @@
+<script>
+const APP_VERSION = "0.0.4";
+</script>
+
+
+
+
+
+
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -276,10 +286,12 @@
   </div>
 
 
-  <div id="div-extension-information"><i>Ginko Temps Réel - web v0.0.3 - Christophe</i></div>
+  <div id="div-extension-information"></div>
 
 
   <script>
+  document.getElementById("div-extension-information").innerHTML = `<i>Ginko Temps Réel - web v${APP_VERSION} - Christophe</i>`;
+
   // ===== STORAGE =====
   function loadStop(){ return localStorage.getItem("busStop") || "Victor Hugo"; }
   function saveStop(v){ localStorage.setItem("busStop", v); }
@@ -516,7 +528,7 @@
 
 <script>
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./service-worker.js')
+  navigator.serviceWorker.register(`./service-worker.js?v=${APP_VERSION}`)
     .then(() => console.log("Service Worker OK"))
     .catch(err => console.error("SW error:", err));
 }
