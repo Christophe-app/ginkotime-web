@@ -1,5 +1,5 @@
 <script>
-const APP_VERSION = "0.0.6";
+const APP_VERSION = "0.0.7";
 </script>
 
 
@@ -65,6 +65,8 @@ const APP_VERSION = "0.0.6";
   .passage {
     display: grid;
     grid-template-columns: 1fr auto;
+    padding: 2px 0;
+    gap: 4px;
   }
 
   .line-title {
@@ -73,10 +75,19 @@ const APP_VERSION = "0.0.6";
   }
 
   .badge {
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 20px;
     padding: 2px 6px;
     border-radius: 6px;
     color: white;
     font-size: 11px;
+    text-transform: capitalize;
+    font-weight: 600;
+    letter-spacing: 0.2px;
   }
 
   .line-badge {
@@ -277,6 +288,7 @@ const APP_VERSION = "0.0.6";
     <button data-stop="Lebeuf">Lebeuf</button>
     <button data-stop="Chopin">Chopin</button>
     <button data-stop="Révolution">Révolution</button>
+    <button data-stop="Courbet">Courbet</button>
     <button data-stop="Cité des arts">Cité des arts</button>
   </div>
 
@@ -319,51 +331,69 @@ const APP_VERSION = "0.0.6";
   }
 
   // ===== PARSE =====
-  function parse(html,stop){
-    const doc=new DOMParser().parseFromString(html,"text/html");
-    const result={};
+  function parse(html, stop){
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  const result = {};
 
-    [...doc.body.querySelectorAll("div,li,section")].forEach(el=>{
-      const text=el.textContent?.replace(/\s+/g," ").trim();
-      if(!text || !text.includes("direction")) return;
-      if(stop && !text.includes(stop)) return;
+  const blocks = [...doc.body.querySelectorAll("div,li,section")];
 
-      const m=text.match(/\b(L\d+|T\d+|Plan B|Ginko Citadelle|\d{1,2})\b/);
-      if(!m) return;
+  for (const el of blocks) {
+    const text = el.textContent?.replace(/\s+/g, " ").trim();
+    if (!text) continue;
 
-      const ligne=m[1];
-      const dir=(text.match(/direction\s+([^,]+)/i)||[])[1]||"—";
+    const lower = text.toLowerCase();
 
-      const passages=[];
-      // ===== Cas normal : avec affluence =====
-      [...text.matchAll(/(\d{1,2}\s*min|\d{1,2}:\d{2})\s+Affluence\s+(faible|moyenne|forte)/gi)]
-      .forEach(x=>{
+    // ✅ CAS IMPORTANT : arrêt non desservi
+    if (lower.includes("non desservi")) {
+      return [{
+        ligne: stop,
+        dir: "—",
+        passages: [{
+          temps: "❌",
+          affluence: null,
+          note: "Non desservi"
+        }]
+      }];
+    }
+
+    // on ne filtre plus sur "direction" trop tôt
+    const m = text.match(/\b(L\d+|T\d+|Plan B|Ginko Citadelle|\d{1,2})\b/);
+    if (!m) continue;
+
+    const ligne = m[1];
+    const dir = (text.match(/direction\s+([^,]+)/i) || [])[1] || "—";
+
+    const passages = [];
+
+    // cas normal
+    [...text.matchAll(/(\d{1,2}\s*min|\d{1,2}:\d{2})\s+Affluence\s+(faible|moyenne|forte)/gi)]
+      .forEach(x => {
         passages.push({
-          temps:x[1],
-          affluence:x[2].toLowerCase()
+          temps: x[1],
+          affluence: x[2].toLowerCase()
         });
       });
 
-      // ===== Jour gris : horaires sans affluence =====
-      if(!passages.length){
-
-        [...text.matchAll(/(\d{1,2}\s*min|\d{1,2}:\d{2})/g)]
-        .forEach(x=>{
+    // fallback sans affluence
+    if (!passages.length) {
+      [...text.matchAll(/(\d{1,2}\s*min|\d{1,2}:\d{2})/g)]
+        .forEach(x => {
           passages.push({
-            temps:x[1],
-            affluence:null
+            temps: x[1],
+            affluence: null
           });
         });
-      }
-      if(!passages.length) return;
+    }
 
-      const k=ligne+"_"+dir;
-      if(!result[k]) result[k]={ligne,dir,passages:[]};
-      result[k].passages.push(...passages);
-    });
+    if (!passages.length) continue;
 
-    return Object.values(result);
+    const k = ligne + "_" + dir;
+    if (!result[k]) result[k] = { ligne, dir, passages: [] };
+    result[k].passages.push(...passages);
   }
+
+  return Object.values(result);
+}
 
   // ===== COLORS =====
   function getLineColor(line){
@@ -397,36 +427,64 @@ const APP_VERSION = "0.0.6";
 
   // ===== RENDER =====
   function render(data){
-    const c=document.getElementById("container");
-    c.innerHTML="";
+    const c = document.getElementById("container");
+    c.innerHTML = "";
 
-    data.forEach(info=>{
-      if(!info.passages.length) return;
+    data.forEach(info => {
 
-      const cleanLine = info.ligne.replace("Ginko ","").trim();
-      const color=getLineColor(cleanLine);
+      if (!info.passages || !info.passages.length) return;
 
-      const div=document.createElement("div");
-      div.className="line";
+      const div = document.createElement("div");
+      div.className = "line";
 
-      div.style.background=hexToRgba(color,0.08);
-      div.style.borderLeft=`4px solid ${color}`;
+      // CAS : arrêt non desservi
+      const isNonDesservi = info.passages[0].note === "Non desservi";
 
-      div.innerHTML=`
+      if (isNonDesservi) {
+        div.style.background = "rgba(231, 76, 60, 0.08)";
+        div.style.borderLeft = "4px solid #e74c3c";
+
+        div.innerHTML = `
+          <div class="line-title">
+            <span class="line-badge" style="background:#e74c3c">
+              ${info.ligne}
+            </span>
+            ${info.dir && info.dir !== "—" ? `→ ${info.dir}` : ""}
+          </div>
+
+          <div style="padding:8px 0; color:#c0392b; font-weight:bold;">
+            ❌ Arrêt non desservi
+          </div>
+        `;
+
+        c.appendChild(div);
+        return;
+      }
+
+      // 🟢 CAS NORMAL
+      const cleanLine = info.ligne.replace("Ginko ", "").trim();
+      const color = getLineColor(cleanLine);
+
+      div.style.background = hexToRgba(color, 0.08);
+      div.style.borderLeft = `4px solid ${color}`;
+
+      div.innerHTML = `
         <div class="line-title">
           <span class="line-badge" style="background:${color}">
             ${info.ligne}
           </span>
-          → ${info.dir}
+          ${info.dir && info.dir !== "—" ? `→ ${info.dir}` : ""}
         </div>
-        ${info.passages.slice(0,3).map(p=>`
+
+        ${info.passages.slice(0, 3).map(p => `
           <div class="passage">
             <span>${p.temps}</span>
             ${p.affluence
               ? `<span class="badge ${p.affluence}">${p.affluence}</span>`
               : ""
             }
-          </div>`).join("")}
+          </div>
+        `).join("")}
       `;
 
       c.appendChild(div);
