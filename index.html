@@ -1,5 +1,5 @@
 <script>
-const APP_VERSION = "0.0.4";
+const APP_VERSION = "0.0.5";
 </script>
 
 
@@ -250,6 +250,11 @@ const APP_VERSION = "0.0.4";
 
 
 <body>
+<div id="offline" style="display:none;">
+    ❌ Pas de connexion internet
+</div>
+
+
 <div id="app">
 
 
@@ -494,6 +499,11 @@ const APP_VERSION = "0.0.4";
     }
   });
 
+  function showOffline(isOffline) {
+    document.getElementById("offline").style.display = isOffline ? "block" : "none";
+    document.getElementById("app").style.display = isOffline ? "none" : "block";
+  }
+
   // ===== CLOCK =====
   setInterval(()=>{
     document.getElementById("clock").textContent=new Date().toLocaleString("fr-FR");
@@ -507,10 +517,14 @@ const APP_VERSION = "0.0.4";
     const container=document.getElementById("container");
     try{
       const data=await fetchData(loadStop());
-      if(!data.length) container.innerHTML="<i>Aucune donnée disponible</i>";
-      else render(data);
+      showOffline(false);
+      if (!data.length) {
+        container.innerHTML = "<i>Aucune donnée disponible</i>";
+      } else {
+        render(data);
+      }
     }catch{
-      container.innerHTML="<i>Erreur</i>";
+      showOffline(true);
     }
     finally{
         loading=false;
