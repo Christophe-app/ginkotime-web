@@ -1,5 +1,5 @@
 <script>
-const APP_VERSION = "0.0.11";
+const APP_VERSION = "0.0.12";
 </script>
 
 
@@ -438,19 +438,13 @@ const APP_VERSION = "0.0.11";
     container.innerHTML = "";
 
     data.forEach(info => {
-      if (!info.passages || !info.passages.length) {
-        return;
-      }
+      if (!info.passages || !info.passages.length) return;
 
-      const direction =
-        info.dir ??
-        info.direction ??
-        "—";
+      const direction = info.dir ?? info.direction ?? "—";
 
       const div = document.createElement("div");
       div.className = "line";
 
-      // Arrêt non desservi
       const isNonDesservi = info.passages[0]?.note === "Non desservi";
 
       const cleanLine = info.ligne
@@ -463,75 +457,60 @@ const APP_VERSION = "0.0.11";
       div.style.background = hexToRgba(color, 0.08);
       div.style.borderLeft = `4px solid ${color}`;
 
+      // ===== HEADER =====
+      const title = document.createElement("div");
+      title.className = "line-title";
 
+      const badge = document.createElement("span");
+      badge.className = "line-badge";
+      badge.style.background = color;
+      badge.style.color = "#000";
+      badge.style.border = "1px solid #ddd";
+      badge.textContent = info.ligne;
+
+      title.appendChild(badge);
+
+      if (direction !== "—") {
+        const dir = document.createTextNode(` → ${direction}`);
+        title.appendChild(dir);
+      }
+
+      div.appendChild(title);
+
+      // ===== NON DESSERVI =====
       if (isNonDesservi) {
         div.classList.add("non-desservi");
 
-        div.innerHTML = `
-          <div class="line-title">
-            <span
-              class="line-badge"
-              style="
-                background:${color};
-                color:#000;
-                border:1px solid #ddd;
-              "
-            >
-              ${info.ligne}
-            </span>
+        const warning = document.createElement("div");
+        warning.style.padding = "8px 0";
+        warning.style.color = "#c0392b";
+        warning.style.fontWeight = "bold";
+        warning.textContent = "❌ Arrêt non desservi";
 
-            ${direction !== "—"
-              ? `→ ${direction}`
-              : ""
-            }
-          </div>
-
-          <div style="
-            padding:8px 0;
-            color:#c0392b;
-            font-weight:bold;
-          ">
-            ❌ Arrêt non desservi
-          </div>
-        `;
-
+        div.appendChild(warning);
         container.appendChild(div);
         return;
       }
 
-      div.innerHTML = `
-        <div class="line-title">
-          <span
-            class="line-badge"
-            style="
-              background:${color};
-              color:#000;
-              border:1px solid #ddd;
-            "
-          >
-            ${info.ligne}
-          </span>
+      // ===== PASSAGES =====
+      info.passages.slice(0, 3).forEach(p => {
+        const row = document.createElement("div");
+        row.className = "passage";
 
-          ${direction !== "—"
-            ? `→ ${direction}`
-            : ""
-          }
+        const left = document.createElement("span");
+        left.textContent = p.temps;
 
-        </div>
+        row.appendChild(left);
 
-        ${info.passages.slice(0, 3).map(p => `
-          <div class="passage">
-            <span>${p.temps}</span>
+        if (p.affluence) {
+          const right = document.createElement("span");
+          right.className = `badge ${p.affluence}`;
+          right.textContent = p.affluence;
+          row.appendChild(right);
+        }
 
-            ${p.affluence
-              ? `<span class="badge ${p.affluence}">
-                   ${p.affluence}
-                 </span>`
-              : ""
-            }
-          </div>
-        `).join("")}
-      `;
+        div.appendChild(row);
+      });
 
       container.appendChild(div);
     });
