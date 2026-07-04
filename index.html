@@ -1,5 +1,5 @@
 <script>
-const APP_VERSION = "0.0.9";
+const APP_VERSION = "0.0.10";
 </script>
 
 
@@ -311,16 +311,19 @@ const APP_VERSION = "0.0.9";
   const API_URL="https://www.ginko.voyage/se-deplacer/horaires-affluences/horaires-en-temps-reel?tx_kgmoncompte_kgmoncompte_ajax[action]=ajax&tx_kgmoncompte_kgmoncompte_ajax[controller]=Main&type=476&cHash=8496df246e50c379bcbee75cf3fc15c6";
 
   async function fetchData(busStop){
-    const p=new URLSearchParams();
-    p.append("requete","tempsreel_submit");
-    p.append("requete_val[arret]",busStop);
-    const res=await fetch(API_URL,{
+    const params = new URLSearchParams();
+    params.append("requete","tempsreel_submit");
+    params.append("requete_val[arret]",busStop);
+
+    const response=await fetch(API_URL,{
       method:"POST",
       headers:{ "Content-Type":"application/x-www-form-urlencoded" },
-      body:p.toString()
+      body:params.toString()
     });
-    const html=await res.text();
-    const data=parse(html,busStop);
+    
+    const html=await response.text();
+    const data=parse(html);
+    
     return {html,data};
   }
 
