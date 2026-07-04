@@ -1,5 +1,5 @@
 <script>
-const APP_VERSION = "0.0.8";
+const APP_VERSION = "0.0.9";
 </script>
 
 
@@ -13,13 +13,10 @@ const APP_VERSION = "0.0.8";
 <head>
   <meta charset="UTF-8">
   <title>Ginko Temps Réel</title>
-  
   <link rel="icon" href="favicon.ico">
-
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#00abc4">
   <link rel="icon" href="favicon.ico">
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
@@ -32,17 +29,14 @@ const APP_VERSION = "0.0.8";
     overflow-x: hidden;
     width: 100vw;
   }
-
   html, body {
     width: 100% !important;
   }
-
   #offline {
     display:none;
     text-align:center;
     padding-top:40px;
   }
-
   #app {
     width: 100%;
     max-width: 700px;
@@ -51,7 +45,6 @@ const APP_VERSION = "0.0.8";
     background: #d9d9db;
     min-height: 100vh;
   }
-
   #container {
     width: 100%;
     box-sizing: border-box;
@@ -61,25 +54,36 @@ const APP_VERSION = "0.0.8";
     flex-direction: column;
     gap: 10px;
   }
-
   .line {
     border-radius: 12px;
     padding: 12px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    display: flex;
+    flex-direction: column;
+    min-height: 110px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
   }
-
+  .line:hover {
+    transform: translateX(2px);
+    transition: 0.15s ease;
+  }
+  .line.non-desservi {
+    min-height: unset;
+    height: auto;
+  }
   .passage {
     display: grid;
     grid-template-columns: 1fr auto;
     padding: 2px 0;
     gap: 4px;
   }
-
   .line-title {
     font-weight: bold;
     margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
-
   .badge {
     line-height: 1;
     display: inline-flex;
@@ -95,32 +99,32 @@ const APP_VERSION = "0.0.8";
     font-weight: 600;
     letter-spacing: 0.2px;
   }
-
   .line-badge {
-    padding: 4px 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 24px;
+    line-height: 1;
+    padding: 0 12px;
     border-radius: 999px;
     font-weight: 600;
     font-size: 12px;
     color: #000;
   }
-
   .faible { background:#2ecc71; }
   .moyenne { background:#f39c12; }
   .forte { background:#e74c3c; }
-
   #controls {
     display:flex;
     gap:6px;
     justify-content:center;
     margin-bottom:15px;
   }
-
   #stopInput {
     width:200px;
     padding:6px;
     border-radius:8px;
   }
-
   #div-clock {
     text-align: center;
     margin-top: 20px;
@@ -129,7 +133,6 @@ const APP_VERSION = "0.0.8";
   #div-clock b {
     font-weight: 600;
   }
-
   button {
     padding:6px 10px;
     border-radius:8px;
@@ -138,7 +141,6 @@ const APP_VERSION = "0.0.8";
     color:white;
     cursor:pointer;
   }
-
   #div-buttons-busstop {
     width: 100%;
     display: grid;
@@ -153,20 +155,16 @@ const APP_VERSION = "0.0.8";
     padding: 6px 10px;
     font-size: 12px;
     border-radius: 8px;
-
     display: inline-flex;
     justify-content: center;
     align-items: center;
-
     white-space: nowrap;
     width: auto;
   }
-
   #ginko-info-calendar {
     text-align:center;
     margin:10px 0;
   }
-
   .ginko-info-calendar-badge {
     padding:4px 10px;
     border-radius:6px;
@@ -185,7 +183,6 @@ const APP_VERSION = "0.0.8";
     margin-top: 40px;
     margin-bottom: 20px;
   }
-
   #div-extension-information {
     text-align: center;
     margin-top: 15px;
@@ -198,7 +195,6 @@ const APP_VERSION = "0.0.8";
     body {
       background: #cfd2d6;
     }
-
     #app {
       width: 95%;
       max-width: 540px;
@@ -209,40 +205,36 @@ const APP_VERSION = "0.0.8";
       overflow: hidden;
       padding-bottom: 10px;
     }
-
     #container {
       padding: 0 10px;
     }
-
     #stopInput {
       width: 90%;
       max-width: 300px;
       margin: 0 auto;
       display: block;
     }
-
     #controls {
       flex-direction: column;
       align-items: center;
     }
-
     #controls button {
       width: 90%;
       max-width: 200px;
     }
-
     .line {
       padding: 10px;
     }
-
     .line-title {
-      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-
     .passage {
       font-size: 14px;
     }
-
     #div-buttons-busstop {
       margin-bottom: 30px;
       display: flex;
@@ -250,20 +242,18 @@ const APP_VERSION = "0.0.8";
       justify-content: center;
       gap: 8px;
     }
-
     #div-buttons-busstop button {
       flex: 0 1 auto;
     }
-
     #div-options {
       flex-direction: column;
     }
-
     #div-options button {
       width: 100%;
     }
   }
   </style>
+
 </head>
 
 
@@ -276,18 +266,14 @@ const APP_VERSION = "0.0.8";
 
 <div id="app">
 
-
   <div id="div-clock"><b>Date :</b> <span id="clock"></span></div>
 
-
   <div id="ginko-info-calendar">Chargement du calendrier...</div>
-
 
   <div id="controls">
     <input id="stopInput" value="Victor Hugo"/>
     <button id="saveStop">Valider</button>
   </div>
-
 
   <div id="div-buttons-busstop">
     <button data-stop="Victor Hugo">Victor Hugo</button>
@@ -300,9 +286,7 @@ const APP_VERSION = "0.0.8";
     <button data-stop="Cité des arts">Cité des arts</button>
   </div>
 
-
   <div id="container"></div>
-
 
   <div id="div-options">
     <button id="button-calendar">Calendrier voyageurs</button>
@@ -310,16 +294,18 @@ const APP_VERSION = "0.0.8";
     <button id="button-schedule-croixdepalente">Horaires : Croix de palente</button>
   </div>
 
-
   <div id="div-extension-information"></div>
+
 
 
   <script>
   document.getElementById("div-extension-information").innerHTML = `<i>Ginko Temps Réel - web v${APP_VERSION} - Christophe</i>`;
 
+
   // ===== STORAGE =====
   function loadStop(){ return localStorage.getItem("busStop") || "Victor Hugo"; }
   function saveStop(v){ localStorage.setItem("busStop", v); }
+
 
   // ===== API =====
   const API_URL="https://www.ginko.voyage/se-deplacer/horaires-affluences/horaires-en-temps-reel?tx_kgmoncompte_kgmoncompte_ajax[action]=ajax&tx_kgmoncompte_kgmoncompte_ajax[controller]=Main&type=476&cHash=8496df246e50c379bcbee75cf3fc15c6";
@@ -328,102 +314,89 @@ const APP_VERSION = "0.0.8";
     const p=new URLSearchParams();
     p.append("requete","tempsreel_submit");
     p.append("requete_val[arret]",busStop);
-
     const res=await fetch(API_URL,{
       method:"POST",
       headers:{ "Content-Type":"application/x-www-form-urlencoded" },
       body:p.toString()
     });
-
-    return parse(await res.text(),busStop);
+    const html=await res.text();
+    const data=parse(html,busStop);
+    return {html,data};
   }
+
 
   // ===== PARSE =====
-  function parse(html, busStopSearch) {
-  const doc = new DOMParser().parseFromString(html, "text/html");
-  const result = {};
+  function parse(html){
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    const result = {};
+    const items = doc.querySelectorAll("li.item-tpsreel");
 
-  const blocks = [...doc.body.querySelectorAll("div, li, section")];
+    for (const item of items) {
+      const ligne =
+        item.querySelector(".tpsreel-ligne")
+          ?.textContent
+          ?.replace(/\s+/g, " ")
+          .trim() || null;
 
-  for (const el of blocks) {
+      const destination =
+        item.querySelector(".tpsreel-destination strong")
+          ?.textContent
+          ?.replace(/\s+/g, " ")
+          .trim() || "—";
 
-    const text = el.textContent?.replace(/\s+/g, " ").trim();
-    if (!text) continue;
+      if (!ligne) continue;
 
-    const lower = text.toLowerCase();
+      const key = `${ligne}|${destination}`;
 
-    // Arrêt non desservi
-    if (lower.includes("non desservi")) {
-      return [{
-        ligne: busStopSearch || "—",
-        dir: "—",
-        direction: "—",
-        passages: [{
-          temps: "❌",
-          affluence: null,
-          note: "Non desservi"
-        }]
-      }];
+      if (!result[key]) {
+        result[key] = {
+          ligne,
+          dir: destination,
+          passages: []
+        };
+      }
+
+      const passages = item.querySelectorAll("a.tpsreel-temps-item");
+
+      for (const p of passages) {
+        let temps = null;
+        const gkTemps = p.querySelector(".gk-temps");
+        const gkHoraire = p.querySelector(".gk-horaire");
+        const gkMot = p.querySelector(".gk-mot");
+
+        if (gkMot) {
+          result[key].passages.push({
+            temps: "❌",
+            affluence: null,
+            note: gkMot.textContent.trim()
+          });
+          continue;
+        }
+
+        if (gkTemps) temps = `${gkTemps.textContent.trim()} min`;
+        else if (gkHoraire) temps = gkHoraire.textContent.trim();
+
+        if (!temps) continue;
+
+        let affluence = null;
+
+        if (p.querySelector(".icon-affluence-1")) affluence = "faible";
+        else if (p.querySelector(".icon-affluence-2")) affluence = "moyenne";
+        else if (p.querySelector(".icon-affluence-3")) affluence = "forte";
+
+        const duplicate = result[key].passages.some(
+          x => x.temps === temps && x.affluence === affluence && !x.note
+        );
+
+        if (!duplicate) {
+          result[key].passages.push({ temps, affluence });
+        }
+      }
     }
 
-    // Filtrage éventuel sur l'arrêt recherché
-    if (busStopSearch && !text.includes(busStopSearch)) {
-      continue;
-    }
-
-    const m = text.match(
-      /\b(L\d+|T\d+|Plan B|Ginko Citadelle|\d{1,2})\b/
-    );
-
-    if (!m) continue;
-
-    const ligne = m[1];
-
-    const dir =
-      (text.match(/direction\s+([^,]+)/i) || [])[1]?.trim() || "—";
-
-    const passages = [];
-
-    // Cas normal avec affluence
-    [...text.matchAll(
-      /(\d{1,2}\s*min|\d{1,2}:\d{2})\s+Affluence\s+(faible|moyenne|forte)/gi
-    )].forEach(x => {
-      passages.push({
-        temps: x[1],
-        affluence: x[2].toLowerCase()
-      });
-    });
-
-    // Gray day : horaires sans affluence
-    if (!passages.length) {
-      [...text.matchAll(
-        /(\d{1,2}\s*min|\d{1,2}:\d{2})/g
-      )].forEach(x => {
-        passages.push({
-          temps: x[1],
-          affluence: null
-        });
-      });
-    }
-
-    if (!passages.length) continue;
-
-    const k = ligne + "_" + dir;
-
-    if (!result[k]) {
-      result[k] = {
-        ligne,
-        dir,
-        direction: dir,
-        passages: []
-      };
-    }
-
-    result[k].passages.push(...passages);
+    return Object.values(result);
   }
 
-  return Object.values(result);
-}
 
   // ===== COLORS =====
   function getLineColor(line){
@@ -455,14 +428,13 @@ const APP_VERSION = "0.0.8";
     return `rgba(${r},${g},${b},${alpha})`;
   }
 
+
   // ===== RENDER =====
   function render(data) {
-
     const container = document.getElementById("container");
     container.innerHTML = "";
 
     data.forEach(info => {
-
       if (!info.passages || !info.passages.length) {
         return;
       }
@@ -476,17 +448,32 @@ const APP_VERSION = "0.0.8";
       div.className = "line";
 
       // Arrêt non desservi
-      const isNonDesservi =
-        info.passages[0]?.note === "Non desservi";
+      const isNonDesservi = info.passages[0]?.note === "Non desservi";
+
+      const cleanLine = info.ligne
+        .replace("Ginko ", "")
+        .replace(/\s+/g, " ")
+        .trim();
+
+      const color = getLineColor(cleanLine);
+
+      div.style.background = hexToRgba(color, 0.08);
+      div.style.borderLeft = `4px solid ${color}`;
+
 
       if (isNonDesservi) {
-
-        div.style.background = "rgba(231,76,60,0.08)";
-        div.style.borderLeft = "4px solid #e74c3c";
+        div.classList.add("non-desservi");
 
         div.innerHTML = `
           <div class="line-title">
-            <span class="line-badge" style="background:#e74c3c">
+            <span
+              class="line-badge"
+              style="
+                background:${color};
+                color:#000;
+                border:1px solid #ddd;
+              "
+            >
               ${info.ligne}
             </span>
 
@@ -509,19 +496,8 @@ const APP_VERSION = "0.0.8";
         return;
       }
 
-      const cleanLine = info.ligne
-        .replace("Ginko ", "")
-        .replace(/\s+/g, " ")
-        .trim();
-
-      const color = getLineColor(cleanLine);
-
-      div.style.background = hexToRgba(color, 0.08);
-      div.style.borderLeft = `4px solid ${color}`;
-
       div.innerHTML = `
         <div class="line-title">
-
           <span
             class="line-badge"
             style="
@@ -558,6 +534,7 @@ const APP_VERSION = "0.0.8";
     });
   }
 
+
   // ===== CALENDAR =====
   async function loadCalendar(){
     try{
@@ -588,8 +565,8 @@ const APP_VERSION = "0.0.8";
     }
   }
 
-  // ===== EVENTS FIX =====
 
+  // ===== EVENTS FIX =====
   // boutons externes (FIX)
   document.getElementById("button-calendar").addEventListener("click", () => {
     window.open("https://www.ginko.voyage/se-deplacer/horaires-affluences/calendrier-voyageurs/", "_blank");
@@ -624,15 +601,27 @@ const APP_VERSION = "0.0.8";
     }
   });
 
+
+  // Mode offline
+  function isOffline(html, data) {
+    if (!html) return true;
+    if (html.includes("❌ Aucune connexion internet ❌")) return true;
+    if (html.includes("showOffline")) return true;
+    if (!html.includes("item-tpsreel")) return true;
+    if (data && data.length > 0) return false;
+    return false;
+  }
   function showOffline(isOffline) {
     document.getElementById("offline").style.display = isOffline ? "block" : "none";
     document.getElementById("app").style.display = isOffline ? "none" : "block";
   }
 
+
   // ===== CLOCK =====
   setInterval(()=>{
     document.getElementById("clock").textContent=new Date().toLocaleString("fr-FR");
   },1000);
+
 
   // ===== MAIN =====
   let loading=false;
@@ -640,19 +629,24 @@ const APP_VERSION = "0.0.8";
     if(loading) return;
     loading=true;
     const container=document.getElementById("container");
+
     try{
-      const data=await fetchData(loadStop());
+      const {html,data}=await fetchData(loadStop());
+      if(isOffline(html,data)){
+        showOffline(true);
+        return;
+      }
       showOffline(false);
-      if (!data.length) {
-        container.innerHTML = "<i>Aucune donnée disponible</i>";
+      if(!data.length){
+        container.innerHTML="<i>Aucune donnée disponible</i>";
       } else {
         render(data);
       }
-    }catch{
+    } catch {
       showOffline(true);
     }
-    finally{
-        loading=false;
+    finally {
+      loading=false;
     }
   }
 
