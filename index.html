@@ -1,5 +1,5 @@
 <script>
-const APP_VERSION = "0.0.10";
+const APP_VERSION = "0.0.11";
 </script>
 
 
@@ -657,7 +657,8 @@ const APP_VERSION = "0.0.10";
   stopInput.value=loadStop();
   loadData();
   loadCalendar();
-  setInterval(loadData, 30000);
+  const REFRESH_INTERVAL = 60; // secondes
+  setInterval(loadData, REFRESH_INTERVAL * 1000);
   </script>
 
 </div>
